@@ -1,0 +1,143 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.google.appengine:gradle-appengine-plugin:1.9.34"
+    }
+}
+
+
+
+
+apply plugin: "war"
+apply plugin: "appengine"
+apply plugin: "eclipse"
+
+repositories{
+  mavenCentral()
+}
+
+sourceSets{
+    integTest {
+        java {
+            srcDir file("src/integTest/java")
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+        resources{
+            srcDir file("src/integTest/resources")
+        }
+    }
+}
+
+configurations {
+    integTestCompile.extendsFrom testCompile
+    integTestRuntime.extendsFrom testRuntime
+} 
+
+eclipse{
+  jdt{
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+  }
+  classpath{
+    containers "com.google.appengine.eclipse.core.GAE_CONTAINER", "org.eclipse.jdt.launching.JRE_CONTAINER"
+    downloadSources = true
+    downloadJavadoc = false
+    defaultOutputDir = file("src/main/webapp/WEB-INF/classes")
+  }
+  project{
+    natures "com.google.appengine.eclipse.core.gaeNature", "org.eclipse.wst.common.project.facet.core.nature"
+  }
+}
+
+ext {
+	appEngineVersion = "1.9.34"
+	dataNucleusAppEngineVersion = "2.1.2"
+	dataNucleusCoreVersion = "3.1.3"
+	jerseyContainerServletVersion = "2.15"
+	jacksonVersion = "2.5.1"
+	objectifyVersion = "5.1.12"
+	guiceVersion = "3.0"
+	guiceHk2BridgeVersion = "2.4.0-b10"
+}
+dependencies{
+  appengineSdk "com.google.appengine:appengine-java-sdk:$appEngineVersion"
+  providedCompile "javax.servlet:servlet-api:2.5"
+
+  runtime "org.ow2.asm:asm:4.2"
+  runtime "org.hibernate:hibernate-validator:5.1.3.Final"
+
+  compile "net.sf.jsr107cache:jsr107cache:1.1"
+  compile "com.google.appengine:appengine-api-1.0-sdk:$appEngineVersion"
+  compile "com.google.appengine:appengine-endpoints:$appEngineVersion"
+  compile "com.google.appengine:appengine-endpoints-deps:$appEngineVersion"
+  compile "com.google.appengine:appengine-api-labs:$appEngineVersion"
+  compile "com.google.appengine.orm:datanucleus-appengine:$dataNucleusAppEngineVersion"
+  compile "com.google.appengine:appengine-jsr107cache:$appEngineVersion"
+  compile "org.datanucleus:datanucleus-core:$dataNucleusCoreVersion"
+  testCompile "com.google.appengine:appengine-testing:$appEngineVersion"
+  testCompile "com.google.appengine:appengine-api-stubs:$appEngineVersion"
+
+  compile "com.googlecode.objectify:objectify:$objectifyVersion"
+
+  compile "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyContainerServletVersion"
+  compile ("com.google.inject.extensions:guice-servlet:$guiceVersion"){
+    exclude group: "com.google.inject"
+  }
+  compile ("com.google.inject:guice:$guiceVersion"){
+    exclude group: "asm", module: "asm"
+  }
+  compile ("org.glassfish.hk2:guice-bridge:$guiceHk2BridgeVersion"){
+    exclude group: "com.google.inject"
+  }
+  compile "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:$jacksonVersion"
+  compile "com.fasterxml.jackson.datatype:jackson-datatype-guava:$jacksonVersion"
+  compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:$jacksonVersion"
+
+  compile "com.google.guava:guava:18.0"
+  compile "org.apache.commons:commons-lang3:3.3.2"
+  compile "org.slf4j:slf4j-api:1.7.10"
+  compile "org.slf4j:slf4j-jdk14:1.7.10"
+
+  testCompile "org.testng:testng:6.8.21"
+  testCompile "org.mockito:mockito-all:1.10.19"
+  testCompile "org.powermock:powermock-module-testng:1.6.2"
+  testCompile "org.powermock:powermock-api-mockito:1.6.2"
+  testCompile "org.hamcrest:java-hamcrest:2.0.0.0"
+
+}
+
+appengine {
+  downloadSdk=true
+  httpPort=8888
+  appcfg {
+    app{
+      id = "biswadahal"
+    }
+    email = "biswadahal@gmail.com"
+    passIn = true
+  }
+}
+
+task delJars(type: Delete){
+  doLast{
+    configurations.runtime.files.each{
+      def f =  file("$projectDir/src/main/webapp/WEB-INF/lib/${it.name}")
+      ant.delete(file: f)
+    }
+  }
+}
+task prepWar(type:Copy, dependsOn: delJars) {
+  from configurations.runtime.files
+  into "$projectDir/src/main/webapp/WEB-INF/lib"
+}
+
+task integTest(type: Test){
+    description "Run integration tests"
+    testClassesDir = project.sourceSets.integTest.output.classesDir
+    classpath = project.sourceSets.integTest.runtimeClasspath
+}
+test.finalizedBy(integTest)
