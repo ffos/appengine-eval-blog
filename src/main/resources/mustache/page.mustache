@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html x-data-ptemplate="{{pageTemplate.key}}" x-data-ptemplate-title="{{pageTemplate.meta.title}}">
+    <head>
+      <title>{{page.meta.title}}</title>
+      {{{pageTemplate.head}}}
+    {{#page.extraCss}}
+      <link rel="stylesheet" href="{{.}}" type="text/css"/>
+    {{/page.extraCss}}
+    {{#page.extraJs}}
+      <script src="{{.}}" type="text/javascript"></script>
+    {{/page.extraJs}}
+    </head>
+
+    <body>
+      {{{pageTemplate.body}}}
+      {{{page.htmlContent}}}
+      {{{pageTemplate.footer}}}
+    </body>
+</html>
