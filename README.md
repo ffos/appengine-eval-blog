@@ -6,6 +6,9 @@ It is still a work in progress, and was implemented to evaluate the google cloud
 Since the platform is google's app-engine, there are some limitations and necessary workarounds. To view those that I encountered, check [AppEngineWorkarounds.md](AppEngineWorkarounds.md)
 
 
+## API calls sample
+See [Sample.md](Sample.md)
+
 ## Running this app
 
 To run this project. Do the following, replacing file-paths and other specific configuration where necessary:
