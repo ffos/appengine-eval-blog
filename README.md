@@ -60,7 +60,7 @@ See: https://cloud.google.com/appengine/docs/java/tools/uploadinganapp
 
 
 ## Issues with AppEngine
-* https://code.google.com/p/googleappengine/issues/detail?id=9634
+* See: [AppEngineWorkarounds.md](AppEngineWorkarounds.md)
 
 
 
